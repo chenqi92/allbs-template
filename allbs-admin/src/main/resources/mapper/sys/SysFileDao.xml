@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.allbs.admin.dao.sys.SysFileDao">
+
+    <resultMap type="cn.allbs.admin.entity.sys.SysFileEntity" id="SysFileMap">
+        <result property="id" column="id"/>
+        <result property="fileName" column="file_name"/>
+        <result property="bucketName" column="bucket_name"/>
+        <result property="original" column="original"/>
+        <result property="type" column="type"/>
+        <result property="fileSize" column="file_size"/>
+        <result property="relationCode" column="relation_code"/>
+        <result property="delFlg" column="del_flg"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="baseColumn">
+        `id`,
+        `file_name`,
+        `bucket_name`,
+        `original`,
+        `type`,
+        `file_size`,
+        `relation_code`,
+        `del_flg`,
+        `create_by`,
+        `create_time`,
+        `update_by`,
+        `update_time`
+    </sql>
+
+    <select id="queryList" resultType="cn.allbs.admin.vo.sys.SysFileVO">
+        select
+        `id`,
+        `file_name`,
+        `bucket_name`,
+        `original`,
+        `type`,
+        `file_size`,
+        `relation_code`,
+        `del_flg`,
+        `create_by`,
+        `create_time`,
+        `update_by`,
+        `update_time`
+        from sys_file
+        <where>
+        AND del_flg = 0
+        <if test="sysFileDTO.id != null">
+            AND `id` = #{sysFileDTO.id}
+        </if>
+        AND del_flg = 0
+        <if test="sysFileDTO.fileName != null and sysFileDTO.fileName != ''">
+            AND `file_name` like concat('%', #{sysFileDTO.fileName} ,'%')
+        </if>
+        AND del_flg = 0
+        <if test="sysFileDTO.bucketName != null and sysFileDTO.bucketName != ''">
+            AND `bucket_name` like concat('%', #{sysFileDTO.bucketName} ,'%')
+        </if>
+        AND del_flg = 0
+        <if test="sysFileDTO.original != null and sysFileDTO.original != ''">
+            AND `original` like concat('%', #{sysFileDTO.original} ,'%')
+        </if>
+        AND del_flg = 0
+        <if test="sysFileDTO.type != null and sysFileDTO.type != ''">
+            AND `type` like concat('%', #{sysFileDTO.type} ,'%')
+        </if>
+        AND del_flg = 0
+        <if test="sysFileDTO.fileSize != null">
+            AND `file_size` = #{sysFileDTO.fileSize}
+        </if>
+        AND del_flg = 0
+        <if test="sysFileDTO.relationCode != null and sysFileDTO.relationCode != ''">
+            AND `relation_code` like concat('%', #{sysFileDTO.relationCode} ,'%')
+        </if>
+        AND del_flg = 0
+        AND del_flg = 0
+        <if test="sysFileDTO.createBy != null and sysFileDTO.createBy != ''">
+            AND `create_by` like concat('%', #{sysFileDTO.createBy} ,'%')
+        </if>
+        AND del_flg = 0
+        <if test="sysFileDTO.createTime != null">
+            AND `create_time` = #{sysFileDTO.createTime}
+        </if>
+        AND del_flg = 0
+        <if test="sysFileDTO.updateBy != null and sysFileDTO.updateBy != ''">
+            AND `update_by` like concat('%', #{sysFileDTO.updateBy} ,'%')
+        </if>
+        AND del_flg = 0
+        <if test="sysFileDTO.updateTime != null">
+            AND `update_time` = #{sysFileDTO.updateTime}
+        </if>
+        </where>
+    </select>
+</mapper>

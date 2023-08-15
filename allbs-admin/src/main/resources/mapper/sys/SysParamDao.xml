@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.allbs.admin.dao.sys.SysParamDao">
+    <resultMap type="cn.allbs.admin.entity.sys.SysParamEntity" id="SysParamMap">
+        <result property="paramId" column="param_id"/>
+        <result property="paramName" column="param_name"/>
+        <result property="paramKey" column="param_key"/>
+        <result property="paramValue" column="param_value"/>
+        <result property="status" column="status"/>
+        <result property="validateCode" column="validate_code"/>
+        <result property="paramType" column="param_type"/>
+        <result property="system" column="system"/>
+        <result property="delFlg" column="del_flg"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+    </resultMap>
+
+    <sql id="baseColumn">
+        `param_id`,
+        `param_name`,
+        `param_key`,
+        `param_value`,
+        `status`,
+        `validate_code`,
+        `param_type`,
+        `system`,
+        `del_flg`,
+        `create_time`,
+        `update_time`,
+        `create_by`,
+        `update_by`
+    </sql>
+
+    <select id="queryList" resultType="cn.allbs.admin.vo.sys.SysParamVO">
+        select
+        `param_id`,
+        `param_name`,
+        `param_key`,
+        `param_value`,
+        `status`,
+        `validate_code`,
+        `param_type`,
+        `system`,
+        `del_flg`,
+        `create_time`,
+        `update_time`,
+        `create_by`,
+        `update_by`
+        from sys_param
+        <where>
+            AND del_flg = 0
+            <if test="sysParamDTO.paramId != null">
+                AND `param_id` = #{sysParamDTO.paramId}
+            </if>
+            AND del_flg = 0
+            <if test="sysParamDTO.paramName != null and sysParamDTO.paramName != ''">
+                AND `param_name` like concat('%', #{sysParamDTO.paramName} ,'%')
+            </if>
+            AND del_flg = 0
+            <if test="sysParamDTO.paramKey != null and sysParamDTO.paramKey != ''">
+                AND `param_key` like concat('%', #{sysParamDTO.paramKey} ,'%')
+            </if>
+            AND del_flg = 0
+            <if test="sysParamDTO.paramValue != null and sysParamDTO.paramValue != ''">
+                AND `param_value` like concat('%', #{sysParamDTO.paramValue} ,'%')
+            </if>
+            AND del_flg = 0
+            <if test="sysParamDTO.status != null">
+                AND `status` = #{sysParamDTO.status}
+            </if>
+            AND del_flg = 0
+            <if test="sysParamDTO.validateCode != null and sysParamDTO.validateCode != ''">
+                AND `validate_code` like concat('%', #{sysParamDTO.validateCode} ,'%')
+            </if>
+            AND del_flg = 0
+            <if test="sysParamDTO.paramType != null">
+                AND `param_type` = #{sysParamDTO.paramType}
+            </if>
+            AND del_flg = 0
+            <if test="sysParamDTO.system != null">
+                AND `system` = #{sysParamDTO.system}
+            </if>
+            AND del_flg = 0
+            AND del_flg = 0
+            <if test="sysParamDTO.createTime != null">
+                AND `create_time` = #{sysParamDTO.createTime}
+            </if>
+            AND del_flg = 0
+            <if test="sysParamDTO.updateTime != null">
+                AND `update_time` = #{sysParamDTO.updateTime}
+            </if>
+            AND del_flg = 0
+            <if test="sysParamDTO.createBy != null and sysParamDTO.createBy != ''">
+                AND `create_by` like concat('%', #{sysParamDTO.createBy} ,'%')
+            </if>
+            AND del_flg = 0
+            <if test="sysParamDTO.updateBy != null and sysParamDTO.updateBy != ''">
+                AND `update_by` like concat('%', #{sysParamDTO.updateBy} ,'%')
+            </if>
+        </where>
+    </select>
+</mapper>
