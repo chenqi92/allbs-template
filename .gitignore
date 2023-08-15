@@ -32,4 +32,9 @@ build/
 ### VS Code ###
 .vscode/
 
-*.versionsBackup
+
+### logs ###
+/logs
+/*.log
+
+
