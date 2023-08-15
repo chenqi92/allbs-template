@@ -1,6 +1,6 @@
 package cn.allbs.admin.config.log.aop;
 
-import cn.allbs.admin.config.log.dto.SysLogDto;
+import cn.allbs.admin.config.log.dto.SysLogInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,5 +14,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class SysLogEvent {
 
-    private final SysLogDto sysLog;
+    private final SysLogInfo sysLog;
 }

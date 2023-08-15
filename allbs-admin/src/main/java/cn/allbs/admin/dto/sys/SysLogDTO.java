@@ -18,4 +18,5 @@ import lombok.EqualsAndHashCode;
 @Data
 @Schema(description = "日志表 参数接收类", name = "SysLogDTO")
 public class SysLogDTO extends SysLogEntity {
+
 }

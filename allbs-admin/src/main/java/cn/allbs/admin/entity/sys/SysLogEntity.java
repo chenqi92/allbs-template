@@ -1,11 +1,7 @@
 package cn.allbs.admin.entity.sys;
 
 
-import java.time.LocalDateTime;
-
-import cn.allbs.admin.config.log.dto.SysLogDto;
 import cn.allbs.admin.entity.BaseEntity;
-import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -60,18 +56,4 @@ public class SysLogEntity extends BaseEntity {
 
     @Schema(description = "异常内容", name = "exception", implementation = String.class)
     private String exception;
-
-    public SysLogEntity(SysLogDto sysLog) {
-        this.method = sysLog.getMethod();
-        this.exception = sysLog.getException();
-        this.params = sysLog.getParams();
-        this.time = Convert.toLong(sysLog.getTime(), 0L);
-        this.remoteAddr = sysLog.getRemoteAddr();
-        this.requestUri = sysLog.getRequestUri();
-        this.title = sysLog.getTitle();
-        this.type = sysLog.getType();
-        this.userAgent = sysLog.getUserAgent();
-        this.setCreateBy(sysLog.getUserName());
-        this.setCreateTime(LocalDateTime.now());
-    }
 }

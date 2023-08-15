@@ -10,7 +10,7 @@ import lombok.Data;
  * @date 2023/5/11
  */
 @Data
-public class SysLogDto {
+public class SysLogInfo {
 
     @Schema(description = "类型", name = "type", implementation = Integer.class)
     private Integer type;
@@ -33,12 +33,15 @@ public class SysLogDto {
     @Schema(description = "参数", name = "params", implementation = String.class)
     private String params;
 
-    @Schema(description = "执行时间", name = "time", implementation = Object.class)
-    private Object time;
+    @Schema(description = "执行时间", name = "time", implementation = Long.class)
+    private Long time;
 
     @Schema(description = "异常说明", name = "exception", implementation = String.class)
     private String exception;
 
     @Schema(description = "用户名", name = "userName", implementation = String.class)
     private String userName;
+
+    @Schema(description = "服务端", name = "serviceId", implementation = String.class)
+    private String serviceId;
 }

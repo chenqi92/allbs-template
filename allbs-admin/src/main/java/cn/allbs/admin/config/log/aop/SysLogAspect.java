@@ -1,7 +1,7 @@
 package cn.allbs.admin.config.log.aop;
 
 import cn.allbs.admin.config.log.annotation.SysLog;
-import cn.allbs.admin.config.log.dto.SysLogDto;
+import cn.allbs.admin.config.log.dto.SysLogInfo;
 import cn.allbs.common.enums.LogTypeEnum;
 import cn.allbs.common.utils.ServletUtil;
 import cn.hutool.core.util.URLUtil;
@@ -44,7 +44,7 @@ public class SysLogAspect {
         String strMethodName = point.getSignature().getName();
         log.debug("请求日志:[类名]:{},[方法]:{}", strClassName, strMethodName);
 
-        SysLogDto logVo = getSysLog();
+        SysLogInfo logVo = getSysLog();
         logVo.setTitle(sysLog.value());
         // 发送异步日志事件
         Long startTime = System.currentTimeMillis();
@@ -63,10 +63,10 @@ public class SysLogAspect {
         return obj;
     }
 
-    private SysLogDto getSysLog() {
+    private SysLogInfo getSysLog() {
         HttpServletRequest request = ((ServletRequestAttributes) Objects
                 .requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
-        SysLogDto sysLog = new SysLogDto();
+        SysLogInfo sysLog = new SysLogInfo();
         sysLog.setType(Integer.valueOf(LogTypeEnum.NORMAL.getType()));
         sysLog.setRemoteAddr(ServletUtil.getClientIP(request));
         sysLog.setRequestUri(URLUtil.getPath(request.getRequestURI()));
