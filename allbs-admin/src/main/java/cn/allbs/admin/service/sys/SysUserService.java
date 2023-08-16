@@ -1,5 +1,6 @@
 package cn.allbs.admin.service.sys;
 
+import cn.allbs.admin.config.dto.UserInfo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -33,4 +34,12 @@ public interface SysUserService extends IService<SysUserEntity> {
      * @return List<SysUserVO>
      */
     List<SysUserVO> queryList(SysUserDTO sysUserDTO);
+
+    /**
+     * 根据用户名查询用户信息
+     *
+     * @param username 用户
+     * @return userInfo
+     */
+    UserInfo findUserInfoByUserName(String username);
 }

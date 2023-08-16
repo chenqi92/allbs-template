@@ -36,4 +36,12 @@ public interface SysMenuDao extends BaseMapper<SysMenuEntity> {
      * @return List<SysMenuVO>
      */
     List<SysMenuVO> queryList(@Param("sysMenuDTO") SysMenuDTO sysMenuDTO);
+
+    /**
+     * 通过角色id查询菜单
+     *
+     * @param roleId 角色ID
+     * @return
+     */
+    List<SysMenuVO> listMenusByRoleId(@Param("roleId") Long roleId);
 }

@@ -8,6 +8,7 @@ import cn.allbs.admin.entity.sys.SysMenuEntity;
 import cn.allbs.admin.dto.sys.SysMenuDTO;
 import cn.allbs.admin.vo.sys.SysMenuVO;
 import cn.allbs.admin.service.sys.SysMenuService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 
@@ -46,5 +47,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuDao, SysMenuEntity> i
     @Override
     public List<SysMenuVO> queryList(SysMenuDTO sysMenuDTO) {
         return this.sysMenuDao.queryList(sysMenuDTO);
+    }
+
+    @Override
+//    @Cacheable(value = MENU_DETAILS, key = "#roleId  + '_menu'", unless = "#result.isEmpty()")
+    public List<SysMenuVO> findMenuByRoleId(Long roleId) {
+        return baseMapper.listMenusByRoleId(roleId);
     }
 }

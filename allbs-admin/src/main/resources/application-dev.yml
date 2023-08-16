@@ -1,33 +1,28 @@
 # mysql 连接池配置
 spring:
   datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
-    druid:
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      username: ${MYSQL_USER:root}
-      password: ${PASS_COMMON_2:123456}
-      url: jdbc:mysql://${MYSQL_HOST:allbs-mysql}:${MYSQL_PORT:3306}/${MYSQL_DB:allbs-admin}?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2B8&allowMultiQueries=true&allowPublicKeyRetrieval=true
-      stat-view-servlet:
-        enabled: true
-        url-pattern: /druid/*
-      filter:
-        stat:
-          log-slow-sql: true
-          slow-sql-millis: 1000
-          merge-sql: true
-          enabled: true
-        wall:
-          config:
-            multi-statement-allow: true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:allbs-mysql}:${MYSQL_PORT:3306}/${MYSQL_DB:allbs-admin}?serverTimezone=UTC&userUnicode=true&characterEncoding=utf-8
+    username: ${MYSQL_USER:root}
+    password: ${PASS_COMMON_2:123456}
+    hikari:
+      connection-timeout: 2000
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 200000
+      auto-commit: true
+      max-lifetime: 1800000
+      connection-test-query: select 1
   redis:
-    database: 0
-    host: ${REDIS_HOST_DEV:127.0.0.1}
-    port: 6379
-    password: ${REDIS_PWD_DEV:123456}
-    timeout: 5000
-    lettuce:
-      pool:
-        min-idle: 2
+    data:
+      database: 0
+      host: ${REDIS_HOST_DEV:127.0.0.1}
+      port: 6379
+      password: ${REDIS_PWD_DEV:123456}
+      timeout: 5000
+      lettuce:
+        pool:
+          min-idle: 2
 # mybatis plus 配置
 mybatis-plus:
   mapper-locations: classpath*:mapper/*/*.xml
@@ -40,36 +35,26 @@ mybatis-plus:
   #  configuration:
   #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   type-handlers-package: com.allbs.admin.config.handler
-  show-sql: true
-  meta-custom:
-    del-flg: delFlag
-    create-name: createBy
-    update-name: updateBy
-  chine-rate: 1.5
-  data-pms: false
 
-# swagger3
+# 文档
 swagger:
-  title: 模版后台管理
-  description: 模版后台管理
+  title: 模版后台
+  description: 模版后台管理文档
   version: 1.0
   securitySchemes:
     Authorization:
-      type: http  #类型
-      in: HEADER    #放 header 里面
-      name: Authorization # header - key
+      type: http
+      in: HEADER
+      name: Authorization
       scheme: bearer
 
   servers:
-    - url: http://127.0.0.1:8888 #服务器 URL
+    - url: http://127.0.0.1:8888
       description: 本地服务器
 springdoc:
   api-docs:
-    # 开启api-docs
     enabled: true
-  # 配置需要生成接口文档的扫描包
   packages-to-scan: cn.allbs.admin.controller
-  # 配置需要生成接口文档的接口路径
   paths-to-match:
 
 # 放行

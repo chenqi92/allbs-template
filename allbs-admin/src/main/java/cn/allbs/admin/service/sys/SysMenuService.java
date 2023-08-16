@@ -33,4 +33,12 @@ public interface SysMenuService extends IService<SysMenuEntity> {
      * @return List<SysMenuVO>
      */
     List<SysMenuVO> queryList(SysMenuDTO sysMenuDTO);
+
+    /**
+     * 通过角色编号查询URL 权限
+     *
+     * @param roleId 角色ID
+     * @return 菜单列表
+     */
+    List<SysMenuVO> findMenuByRoleId(Long roleId);
 }
