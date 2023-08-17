@@ -7,6 +7,7 @@ spring:
     password: ${PASS_COMMON_2:123456}
     hikari:
       connection-timeout: 2000
+      validation-timeout: 5000
       minimum-idle: 5
       maximum-pool-size: 20
       idle-timeout: 200000
