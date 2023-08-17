@@ -2,6 +2,7 @@ package cn.allbs.admin.config.security;
 
 import cn.allbs.admin.config.security.authorization.DeviceClientAuthenticationConverter;
 import cn.allbs.admin.config.security.authorization.DeviceClientAuthenticationProvider;
+import cn.allbs.admin.config.security.util.SecurityUtils;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -134,7 +135,10 @@ public class AuthorizationConfig {
                 );
         // 添加BearerTokenAuthenticationFilter，将认证服务当做一个资源服务，解析请求头中的token
         http.oauth2ResourceServer((resourceServer) -> resourceServer
-                .jwt(Customizer.withDefaults()));
+                .jwt(Customizer.withDefaults())
+                .accessDeniedHandler(SecurityUtils::exceptionHandler)
+                .authenticationEntryPoint(SecurityUtils::exceptionHandler)
+        );
 
         return http.build();
     }
