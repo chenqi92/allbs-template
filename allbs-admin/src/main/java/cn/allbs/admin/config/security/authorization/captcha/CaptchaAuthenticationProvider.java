@@ -14,6 +14,10 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.Objects;
+
+import static cn.allbs.admin.config.constants.SecurityConstant.PASSWORD_LOGIN_TYPE;
+
 /**
  * 验证码校验
  * 注入ioc中替换原先的DaoAuthenticationProvider
@@ -23,7 +27,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  * @author vains
  */
 @Slf4j
-@Component
 public class CaptchaAuthenticationProvider extends DaoAuthenticationProvider {
 
     /**
@@ -32,7 +35,7 @@ public class CaptchaAuthenticationProvider extends DaoAuthenticationProvider {
      * 设置调用父类关于这两个属性的set方法设置进去
      *
      * @param userDetailsService 用户服务，给框架提供用户信息
-     * @param passwordEncoder 密码解析器，用于加密和校验密码
+     * @param passwordEncoder    密码解析器，用于加密和校验密码
      */
     public CaptchaAuthenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         super.setPasswordEncoder(passwordEncoder);
@@ -48,7 +51,15 @@ public class CaptchaAuthenticationProvider extends DaoAuthenticationProvider {
         if (requestAttributes == null) {
             throw new InvalidCaptchaException("Failed to get the current request.");
         }
-        HttpServletRequest request = ((ServletRequestAttributes)requestAttributes).getRequest();
+        HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+
+        // 获取当前登录方式
+        String loginType = request.getParameter("loginType");
+        if (!Objects.equals(loginType, PASSWORD_LOGIN_TYPE)) {
+            // 只要不是密码登录都不需要校验图形验证码
+            log.info("It isn't necessary captcha authenticate.");
+            return super.authenticate(authentication);
+        }
 
         // 获取参数中的验证码
         String code = request.getParameter("code");

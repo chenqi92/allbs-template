@@ -18,7 +18,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.version>3.11.0</maven.compiler.version>
         <java.version>17</java.version>
-        <allbs.version>2.0.1</allbs.version>
+        <allbs.version>2.0.2</allbs.version>
         <druid.version>1.2.18</druid.version>
         <transmittable-thread.version>2.11.4</transmittable-thread.version>
         <snakeyaml.version>2.1</snakeyaml.version>
@@ -96,6 +96,11 @@
             <version>${allbs.version}</version>
         </dependency>
         <dependency>
+            <groupId>cn.allbs</groupId>
+            <artifactId>allbs-common</artifactId>
+            <version>${allbs.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
@@ -110,10 +115,12 @@
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <version>3.5.3.1</version>
         </dependency>
+        <!-- 资源服务 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
         </dependency>
+        <!-- 认证服务 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-authorization-server</artifactId>

@@ -1,5 +1,6 @@
 package cn.allbs.admin.config.security.util;
 
+import cn.allbs.common.constant.StringPool;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -7,11 +8,16 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.BearerTokenError;
 import org.springframework.security.oauth2.server.resource.BearerTokenErrorCodes;
 import org.springframework.security.oauth2.server.resource.authentication.AbstractOAuth2TokenAuthenticationToken;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -29,6 +35,54 @@ public class SecurityUtils {
     private SecurityUtils() {
         // 禁止实例化工具类
         throw new UnsupportedOperationException("Utility classes cannot be instantiated.");
+    }
+
+    /**
+     * 从认证信息中获取客户端token
+     *
+     * @param authentication 认证信息
+     * @return 客户端认证信息，获取失败抛出异常
+     */
+    public static OAuth2ClientAuthenticationToken getAuthenticatedClientElseThrowInvalidClient(Authentication authentication) {
+        OAuth2ClientAuthenticationToken clientPrincipal = null;
+        if (OAuth2ClientAuthenticationToken.class.isAssignableFrom(authentication.getPrincipal().getClass())) {
+            clientPrincipal = (OAuth2ClientAuthenticationToken) authentication.getPrincipal();
+        }
+        if (clientPrincipal != null && clientPrincipal.isAuthenticated()) {
+            return clientPrincipal;
+        }
+        throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_CLIENT);
+    }
+
+    /**
+     * 提取请求中的参数并转为一个map返回
+     *
+     * @param request 当前请求
+     * @return 请求中的参数
+     */
+    public static MultiValueMap<String, String> getParameters(HttpServletRequest request) {
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>(parameterMap.size());
+        parameterMap.forEach((key, values) -> {
+            if (values.length > 0) {
+                for (String value : values) {
+                    parameters.add(key, value);
+                }
+            }
+        });
+        return parameters;
+    }
+
+    /**
+     * 抛出 OAuth2AuthenticationException 异常
+     *
+     * @param errorCode 错误码
+     * @param message   错误信息
+     * @param errorUri  错误对照地址
+     */
+    public static void throwError(String errorCode, String message, String errorUri) {
+        OAuth2Error error = new OAuth2Error(errorCode, message, errorUri);
+        throw new OAuth2AuthenticationException(error);
     }
 
     /**
@@ -110,7 +164,7 @@ public class SecurityUtils {
             wwwAuthenticate.append(" ");
             int i = 0;
             for (Map.Entry<String, String> entry : parameters.entrySet()) {
-                wwwAuthenticate.append(entry.getKey()).append("=\"").append(entry.getValue()).append("\"");
+                wwwAuthenticate.append(entry.getKey()).append(StringPool.EQUALS).append(entry.getValue()).append(StringPool.QUOTE);
                 if (i != parameters.size() - 1) {
                     wwwAuthenticate.append(", ");
                 }
