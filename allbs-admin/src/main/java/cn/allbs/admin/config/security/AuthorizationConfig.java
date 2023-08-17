@@ -155,7 +155,7 @@ public class AuthorizationConfig {
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                 // 授权码模式回调地址，oauth2.1已改为精准匹配，不能只设置域名，并且屏蔽了localhost，本机使用127.0.0.1访问
-                .redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
+                .redirectUri("http://127.0.0.1:8888/login/oauth2/code/messaging-client-oidc")
                 .redirectUri("https://www.baidu.com")
                 // 该客户端的授权范围，OPENID与PROFILE是IdToken的scope，获取授权时请求OPENID的scope时认证服务会返回IdToken
                 .scope(OidcScopes.OPENID)
@@ -190,6 +190,26 @@ public class AuthorizationConfig {
         RegisteredClient byClientId = registeredClientRepository.findByClientId(deviceClient.getClientId());
         if (byClientId == null) {
             registeredClientRepository.save(deviceClient);
+        }
+
+        // PKCE客户端
+        RegisteredClient pkceClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                .clientId("pkce-message-client")
+                // 公共客户端
+                .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+                // 设备码授权
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                // 授权码模式回调地址，oauth2.1已改为精准匹配，不能只设置域名，并且屏蔽了localhost，本机使用127.0.0.1访问
+                .redirectUri("http://127.0.0.1:8888/login/oauth2/code/messaging-client-oidc")
+                .clientSettings(ClientSettings.builder().requireProofKey(Boolean.TRUE).build())
+                // 自定scope
+                .scope("message.read")
+                .scope("message.write")
+                .build();
+        RegisteredClient findPkceClient = registeredClientRepository.findByClientId(pkceClient.getClientId());
+        if (findPkceClient == null) {
+            registeredClientRepository.save(pkceClient);
         }
         return registeredClientRepository;
     }
