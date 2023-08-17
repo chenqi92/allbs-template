@@ -1,4 +1,4 @@
-package cn.allbs.admin.config.security.authorization;
+package cn.allbs.admin.config.security.authorization.device;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

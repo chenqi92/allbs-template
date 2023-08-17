@@ -1,4 +1,4 @@
-package cn.allbs.admin.config.security.authorization;
+package cn.allbs.admin.config.security.authorization.device;
 
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.Transient;

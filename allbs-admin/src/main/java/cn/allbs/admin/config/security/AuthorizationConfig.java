@@ -1,7 +1,7 @@
 package cn.allbs.admin.config.security;
 
-import cn.allbs.admin.config.security.authorization.DeviceClientAuthenticationConverter;
-import cn.allbs.admin.config.security.authorization.DeviceClientAuthenticationProvider;
+import cn.allbs.admin.config.security.authorization.device.DeviceClientAuthenticationConverter;
+import cn.allbs.admin.config.security.authorization.device.DeviceClientAuthenticationProvider;
 import cn.allbs.admin.config.security.util.SecurityUtils;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -133,7 +133,8 @@ public class AuthorizationConfig {
                         .requestMatchers(
                                 mvcMatcherBuilder.pattern("/assets/**"),
                                 mvcMatcherBuilder.pattern("/webjars/**"),
-                                mvcMatcherBuilder.pattern("/login")).permitAll()
+                                mvcMatcherBuilder.pattern("/login"),
+                                mvcMatcherBuilder.pattern("/getCaptcha")).permitAll()
                         .anyRequest().authenticated()
                 )
                 // 指定登录页面
