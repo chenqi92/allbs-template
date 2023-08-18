@@ -21,6 +21,12 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @AutoConfigureBefore(RedisAutoConfiguration.class)
 public class RedisTemplateConfig {
 
+    /**
+     * redis 序列化反序列化配置
+     *
+     * @param redisConnectionFactory 链接工厂
+     * @return RedisTemplate
+     */
     @Bean
     public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();
@@ -31,5 +37,16 @@ public class RedisTemplateConfig {
         redisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         return redisTemplate;
+    }
+
+    /**
+     * 操作hash的情况下使用
+     *
+     * @param connectionFactory redis链接工厂
+     * @return RedisTemplate
+     */
+    @Bean
+    public RedisTemplate<Object, Object> redisHashTemplate(RedisConnectionFactory connectionFactory) {
+        return redisTemplate(connectionFactory);
     }
 }

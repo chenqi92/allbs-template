@@ -77,7 +77,7 @@
             .then(r => {
                 if (r) {
                     let result = JSON.parse(r);
-                    document.getElementById('code-image').src = result.data
+                    document.getElementById('code-image').src = result.data.imageData
                 }
             })
             .catch(error => console.log('error', error));

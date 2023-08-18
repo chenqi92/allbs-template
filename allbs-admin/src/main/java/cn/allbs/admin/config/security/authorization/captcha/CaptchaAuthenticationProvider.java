@@ -1,5 +1,6 @@
 package cn.allbs.admin.config.security.authorization.captcha;
 
+import cn.allbs.admin.config.redis.RedisOperator;
 import cn.allbs.admin.config.security.exception.InvalidCaptchaException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Objects;
 
-import static cn.allbs.admin.config.constants.SecurityConstant.PASSWORD_LOGIN_TYPE;
+import static cn.allbs.admin.config.constants.CacheConstant.*;
+import static cn.allbs.admin.config.constants.SecurityConstant.*;
 
 /**
  * 验证码校验
@@ -29,6 +31,8 @@ import static cn.allbs.admin.config.constants.SecurityConstant.PASSWORD_LOGIN_TY
 @Slf4j
 public class CaptchaAuthenticationProvider extends DaoAuthenticationProvider {
 
+    private final RedisOperator<String> redisOperator;
+
     /**
      * 利用构造方法在通过{@link Component}注解初始化时
      * 注入UserDetailsService和passwordEncoder，然后
@@ -37,7 +41,8 @@ public class CaptchaAuthenticationProvider extends DaoAuthenticationProvider {
      * @param userDetailsService 用户服务，给框架提供用户信息
      * @param passwordEncoder    密码解析器，用于加密和校验密码
      */
-    public CaptchaAuthenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+    public CaptchaAuthenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder, RedisOperator<String> redisOperator) {
+        this.redisOperator = redisOperator;
         super.setPasswordEncoder(passwordEncoder);
         super.setUserDetailsService(userDetailsService);
     }
@@ -54,7 +59,7 @@ public class CaptchaAuthenticationProvider extends DaoAuthenticationProvider {
         HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
 
         // 获取当前登录方式
-        String loginType = request.getParameter("loginType");
+        String loginType = request.getParameter(LOGIN_TYPE_NAME);
         if (!Objects.equals(loginType, PASSWORD_LOGIN_TYPE)) {
             // 只要不是密码登录都不需要校验图形验证码
             log.info("It isn't necessary captcha authenticate.");
@@ -62,15 +67,16 @@ public class CaptchaAuthenticationProvider extends DaoAuthenticationProvider {
         }
 
         // 获取参数中的验证码
-        String code = request.getParameter("code");
+        String code = request.getParameter(CAPTCHA_CODE_NAME);
         if (ObjectUtils.isEmpty(code)) {
             throw new InvalidCaptchaException("The captcha cannot be empty.");
         }
 
-        // 获取session中存储的验证码
-        Object sessionCaptcha = request.getSession(Boolean.FALSE).getAttribute("captcha");
-        if (sessionCaptcha instanceof String sessionCode) {
-            if (!sessionCode.equalsIgnoreCase(code)) {
+        String captchaId = request.getParameter(CAPTCHA_ID_NAME);
+        // 获取缓存中存储的验证码
+        String captchaCode = redisOperator.getAndDelete((IMAGE_CAPTCHA_PREFIX_KEY + captchaId));
+        if (!ObjectUtils.isEmpty(captchaCode)) {
+            if (!captchaCode.equalsIgnoreCase(code)) {
                 throw new InvalidCaptchaException("The captcha is incorrect.");
             }
         } else {

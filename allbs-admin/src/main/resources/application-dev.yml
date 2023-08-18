@@ -14,8 +14,8 @@ spring:
       auto-commit: true
       max-lifetime: 1800000
       connection-test-query: select 1
-  redis:
-    data:
+  data:
+    redis:
       database: 0
       host: ${REDIS_HOST_DEV:127.0.0.1}
       port: 6379
@@ -23,7 +23,10 @@ spring:
       timeout: 5000
       lettuce:
         pool:
-          min-idle: 2
+          max-active: -1
+          max-wait: -1
+          max-idle: 8
+          min-idle: 0
 # mybatis plus 配置
 mybatis-plus:
   mapper-locations: classpath*:mapper/*/*.xml

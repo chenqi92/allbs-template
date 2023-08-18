@@ -24,6 +24,61 @@ public interface SecurityConstant {
     Integer STATUS_LOCK = 9;
 
     /**
+     * 微信登录相关参数——openid：用户唯一id
+     */
+    String WECHAT_PARAMETER_OPENID = "openid";
+
+    /**
+     * 微信登录相关参数——forcePopup：强制此次授权需要用户弹窗确认
+     */
+    String WECHAT_PARAMETER_FORCE_POPUP = "forcePopup";
+
+    /**
+     * 微信登录相关参数——secret：微信的应用秘钥
+     */
+    String WECHAT_PARAMETER_SECRET = "secret";
+
+    /**
+     * 微信登录相关参数——appid：微信的应用id
+     */
+    String WECHAT_PARAMETER_APPID = "appid";
+
+    /**
+     * 三方登录类型——微信
+     */
+    String THIRD_LOGIN_WECHAT = "wechat";
+
+    /**
+     * 三方登录类型——Gitee
+     */
+    String THIRD_LOGIN_GITEE = "gitee";
+
+    /**
+     * 三方登录类型——Github
+     */
+    String THIRD_LOGIN_GITHUB = "github";
+
+    /**
+     * 随机字符串请求头名字
+     */
+    String NONCE_HEADER_NAME = "nonceId";
+
+    /**
+     * 登录方式入参名
+     */
+    String LOGIN_TYPE_NAME = "loginType";
+
+    /**
+     * 验证码id入参名
+     */
+    String CAPTCHA_ID_NAME = "captchaId";
+
+    /**
+     * 验证码值入参名
+     */
+    String CAPTCHA_CODE_NAME = "code";
+
+    /**
      * 登录方式——短信验证码
      */
     String SMS_LOGIN_TYPE = "smsCaptcha";
