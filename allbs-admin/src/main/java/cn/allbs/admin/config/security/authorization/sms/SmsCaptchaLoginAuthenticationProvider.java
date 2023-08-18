@@ -43,7 +43,7 @@ public class SmsCaptchaLoginAuthenticationProvider extends CaptchaAuthentication
 
     @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-            log.info("Authenticate sms captcha...");
+        log.info("Authenticate sms captcha...");
 
         if (authentication.getCredentials() == null) {
             this.logger.debug("Failed to authenticate since no credentials provided");
@@ -67,7 +67,7 @@ public class SmsCaptchaLoginAuthenticationProvider extends CaptchaAuthentication
         if (Objects.equals(loginType, SMS_LOGIN_TYPE)
                 || Objects.equals(grantType, GRANT_TYPE_SMS_CODE)) {
             // 获取存入session的验证码(UsernamePasswordAuthenticationToken的principal中现在存入的是手机号)
-            String smsCaptcha = (String) request.getSession(Boolean.FALSE).getAttribute((String) authentication.getPrincipal());
+            String smsCaptcha = request.getParameter("sms_captcha");
             // 校验输入的验证码是否正确(UsernamePasswordAuthenticationToken的credentials中现在存入的是输入的验证码)
             if (!Objects.equals(smsCaptcha, authentication.getCredentials())) {
                 throw new BadCredentialsException("The sms captcha is incorrect.");
