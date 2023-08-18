@@ -1,6 +1,7 @@
 package cn.allbs.admin.entity.sys;
 
 
+import java.io.Serial;
 import java.time.LocalDateTime;
 
 import cn.allbs.admin.entity.BaseEntity;
@@ -23,6 +24,7 @@ import lombok.EqualsAndHashCode;
 @TableName("sys_dict_item")
 public class SysDictItemEntity extends BaseEntity {
 
+    @Serial
     private static final long serialVersionUID = 885846109560125106L;
 
     @TableId(value = "id", type = IdType.AUTO)

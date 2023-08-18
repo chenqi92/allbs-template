@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serial;
+
 /**
  * 公共参数配置表(sys_param)表实体类
  *
@@ -21,6 +23,7 @@ import lombok.EqualsAndHashCode;
 @TableName("sys_param")
 public class SysParamEntity extends BaseEntity {
 
+    @Serial
     private static final long serialVersionUID = 778287383352720634L;
 
     @TableId(value = "param_id", type = IdType.AUTO)

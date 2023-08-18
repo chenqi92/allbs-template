@@ -1,6 +1,6 @@
 package cn.allbs.admin.service.sys;
 
-import cn.allbs.admin.config.dto.UserInfo;
+import cn.allbs.admin.config.security.model.UserInfo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;

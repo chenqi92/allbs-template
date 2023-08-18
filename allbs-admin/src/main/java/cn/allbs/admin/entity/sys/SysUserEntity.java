@@ -1,6 +1,7 @@
 package cn.allbs.admin.entity.sys;
 
 
+import java.io.Serial;
 import java.time.LocalDateTime;
 
 import cn.allbs.admin.entity.BaseEntity;
@@ -23,6 +24,7 @@ import lombok.EqualsAndHashCode;
 @TableName("sys_user")
 public class SysUserEntity extends BaseEntity {
 
+    @Serial
     private static final long serialVersionUID = -71736497537934016L;
 
     @TableId(value = "user_id", type = IdType.AUTO)

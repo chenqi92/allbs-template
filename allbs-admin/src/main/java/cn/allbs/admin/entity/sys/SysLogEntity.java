@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serial;
+
 /**
  * 日志表(sys_log)表实体类
  *
@@ -21,6 +23,7 @@ import lombok.EqualsAndHashCode;
 @TableName("sys_log")
 public class SysLogEntity extends BaseEntity {
 
+    @Serial
     private static final long serialVersionUID = -10250058606354773L;
 
     @TableId(value = "id", type = IdType.AUTO)

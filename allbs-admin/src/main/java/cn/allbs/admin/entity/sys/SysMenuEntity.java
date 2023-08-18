@@ -1,6 +1,7 @@
 package cn.allbs.admin.entity.sys;
 
 
+import java.io.Serial;
 import java.time.LocalDateTime;
 
 import cn.allbs.admin.entity.BaseEntity;
@@ -23,6 +24,7 @@ import lombok.EqualsAndHashCode;
 @TableName("sys_menu")
 public class SysMenuEntity extends BaseEntity {
 
+    @Serial
     private static final long serialVersionUID = -19111052561332750L;
 
     @TableId(value = "menu_id", type = IdType.AUTO)

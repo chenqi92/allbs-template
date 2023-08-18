@@ -9,6 +9,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * 部门关系表(sys_dept_relation)表实体类
  *
@@ -16,11 +19,11 @@ import lombok.EqualsAndHashCode;
  * @since 2023-08-15 16:11:21
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
 @Schema(description = "部门关系表", name = "sys_dept_relation")
 @TableName("sys_dept_relation")
-public class SysDeptRelationEntity extends BaseEntity {
+public class SysDeptRelationEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 550065197032004770L;
 
     @TableId(value = "ancestor", type = IdType.AUTO)
