@@ -1,9 +1,11 @@
 package cn.allbs.admin.config.security;
 
+import cn.allbs.admin.config.redis.RedisOperator;
 import cn.allbs.admin.config.security.authorization.device.DeviceClientAuthenticationConverter;
 import cn.allbs.admin.config.security.authorization.device.DeviceClientAuthenticationProvider;
 import cn.allbs.admin.config.security.authorization.sms.SmsCaptchaGrantAuthenticationConverter;
 import cn.allbs.admin.config.security.authorization.sms.SmsCaptchaGrantAuthenticationProvider;
+import cn.allbs.admin.config.security.federation.FederatedIdentityIdTokenCustomizer;
 import cn.allbs.admin.config.security.handler.LoginFailureHandler;
 import cn.allbs.admin.config.security.handler.LoginSuccessHandler;
 import cn.allbs.admin.config.security.handler.LoginTargetAuthenticationEntryPoint;
@@ -27,14 +29,11 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
@@ -56,6 +55,7 @@ import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -65,9 +65,9 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
+import static cn.allbs.admin.config.constants.CacheConstant.AUTHORIZATION_JWS_PREFIX_KEY;
 import static cn.allbs.admin.config.constants.SecurityConstant.AUTHORITIES_KEY;
 import static cn.allbs.admin.config.constants.SecurityConstant.GRANT_TYPE_SMS_CODE;
 
@@ -82,9 +82,13 @@ public class AuthorizationConfig {
      */
     private final String LOGIN_URL = "http://127.0.0.1:5173/login";
 
+    private static final String CUSTOM_CONSENT_REDIRECT_URI = "/oauth2/consent/redirect";
+
     private static final String CUSTOM_CONSENT_PAGE_URI = "/oauth2/consent";
 
     private final RedisSecurityContextRepository redisSecurityContextRepository;
+
+    private final RedisOperator<String> redisOperator;
 
     /**
      * 配置端点的过滤器链
@@ -208,7 +212,6 @@ public class AuthorizationConfig {
                 .accessDeniedHandler(SecurityUtils::exceptionHandler)
                 .authenticationEntryPoint(SecurityUtils::exceptionHandler)
         );
-
         // 兼容前后端分离与不分离配置
         http
                 // 当未登录时访问认证端点时重定向至login页面
@@ -218,7 +221,6 @@ public class AuthorizationConfig {
                                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
                         )
                 );
-
         // 使用redis存储、读取登录的认证信息
         http.securityContext(context -> context.securityContextRepository(redisSecurityContextRepository));
 
@@ -232,30 +234,7 @@ public class AuthorizationConfig {
      */
     @Bean
     public OAuth2TokenCustomizer<JwtEncodingContext> oAuth2TokenCustomizer() {
-        return context -> {
-            // 检查登录用户信息是不是UserDetails，排除掉没有用户参与的流程
-            if (context.getPrincipal().getPrincipal() instanceof UserDetails user) {
-                // 获取申请的scopes
-                Set<String> scopes = context.getAuthorizedScopes();
-                // 获取用户的权限
-                Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
-                // 提取权限并转为字符串
-                Set<String> authoritySet = Optional.ofNullable(authorities).orElse(Collections.emptyList()).stream()
-                        // 获取权限字符串
-                        .map(GrantedAuthority::getAuthority)
-                        // 去重
-                        .collect(Collectors.toSet());
-
-                // 合并scope与用户信息
-                authoritySet.addAll(scopes);
-
-                JwtClaimsSet.Builder claims = context.getClaims();
-                // 将权限信息放入jwt的claims中（也可以生成一个以指定字符分割的字符串放入）
-                claims.claim("authorities", authoritySet);
-                // 放入其它自定内容
-                // 角色、头像...
-            }
-        };
+        return new FederatedIdentityIdTokenCustomizer();
     }
 
     /**
@@ -410,15 +389,28 @@ public class AuthorizationConfig {
      * @return JWKSource
      */
     @Bean
+    @SneakyThrows
     public JWKSource<SecurityContext> jwkSource() {
-        KeyPair keyPair = generateRsaKey();
-        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-        RSAKey rsaKey = new RSAKey.Builder(publicKey)
-                .privateKey(privateKey)
-                .keyID(UUID.randomUUID().toString())
-                .build();
-        JWKSet jwkSet = new JWKSet(rsaKey);
+        // 先从redis获取
+        String jwkSetCache = redisOperator.get(AUTHORIZATION_JWS_PREFIX_KEY);
+        if (ObjectUtils.isEmpty(jwkSetCache)) {
+            KeyPair keyPair = generateRsaKey();
+            RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+            RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+            RSAKey rsaKey = new RSAKey.Builder(publicKey)
+                    .privateKey(privateKey)
+                    .keyID(UUID.randomUUID().toString())
+                    .build();
+            // 生成jws
+            JWKSet jwkSet = new JWKSet(rsaKey);
+            // 转为json字符串
+            String jwkSetString = jwkSet.toString(Boolean.FALSE);
+            // 存入redis
+            redisOperator.set(AUTHORIZATION_JWS_PREFIX_KEY, jwkSetString);
+            return new ImmutableJWKSet<>(jwkSet);
+        }
+        // 解析存储的jws
+        JWKSet jwkSet = JWKSet.parse(jwkSetCache);
         return new ImmutableJWKSet<>(jwkSet);
     }
 
@@ -472,6 +464,7 @@ public class AuthorizationConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         // 设置允许跨域的域名,如果允许携带cookie的话,路径就不能写*号, *表示所有的域名都可以跨域访问
         configuration.addAllowedOrigin("http://127.0.0.1:5173");
+        configuration.addAllowedOrigin("http://localhost:5173");
         // 设置跨域访问可以携带cookie
         configuration.setAllowCredentials(true);
         // 允许所有的请求方法 ==> GET POST PUT Delete
