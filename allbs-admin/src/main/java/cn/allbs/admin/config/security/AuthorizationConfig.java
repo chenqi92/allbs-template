@@ -9,6 +9,7 @@ import cn.allbs.admin.config.security.federation.FederatedIdentityIdTokenCustomi
 import cn.allbs.admin.config.security.handler.LoginFailureHandler;
 import cn.allbs.admin.config.security.handler.LoginSuccessHandler;
 import cn.allbs.admin.config.security.handler.LoginTargetAuthenticationEntryPoint;
+import cn.allbs.admin.config.security.model.PermitAllUrlProperties;
 import cn.allbs.admin.config.security.support.RedisSecurityContextRepository;
 import cn.allbs.admin.config.security.util.SecurityUtils;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -65,6 +66,8 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static cn.allbs.admin.config.constants.CacheConstant.AUTHORIZATION_JWS_PREFIX_KEY;
@@ -89,6 +92,10 @@ public class AuthorizationConfig {
     private final RedisSecurityContextRepository redisSecurityContextRepository;
 
     private final RedisOperator<String> redisOperator;
+
+//    private final CustomBearerTokenExtractor customBearerTokenExtractor;
+
+    private final PermitAllUrlProperties permitAllUrlProperties;
 
     /**
      * 配置端点的过滤器链
@@ -143,7 +150,8 @@ public class AuthorizationConfig {
                 )
                 // 处理使用access token访问用户信息端点和客户端注册端点
                 .oauth2ResourceServer((resourceServer) -> resourceServer
-                        .jwt(Customizer.withDefaults()));
+                        .jwt(Customizer.withDefaults())
+                );
 
         // 自定义短信认证登录转换器
         SmsCaptchaGrantAuthenticationConverter converter = new SmsCaptchaGrantAuthenticationConverter();
@@ -189,15 +197,12 @@ public class AuthorizationConfig {
         http.csrf(AbstractHttpConfigurer::disable);
         http.cors(AbstractHttpConfigurer::disable);
         MvcRequestMatcher.Builder mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspect);
+        List<MvcRequestMatcher> mvcRequestMatchers = new ArrayList<>();
+        permitAllUrlProperties.getIgnoreUrls().forEach(ignore -> mvcRequestMatchers.add(mvcMatcherBuilder.pattern(ignore)));
+        permitAllUrlProperties.getIgnoreUrlsMap().forEach((k, v) -> v.forEach(ant -> mvcRequestMatchers.add(mvcMatcherBuilder.pattern(k, ant))));
         http.authorizeHttpRequests((requests) -> requests
-                        .requestMatchers(
-                                mvcMatcherBuilder.pattern("/assets/**"),
-                                mvcMatcherBuilder.pattern("/webjars/**"),
-                                mvcMatcherBuilder.pattern("/login"),
-                                mvcMatcherBuilder.pattern("/getCaptcha"),
-                                mvcMatcherBuilder.pattern("error"),
-                                mvcMatcherBuilder.pattern("/getSmsCaptcha")).permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers(mvcRequestMatchers.toArray(new MvcRequestMatcher[]{}))
+                        .permitAll().anyRequest().authenticated()
                 )
                 // 指定登录页面
                 .formLogin(formLogin ->

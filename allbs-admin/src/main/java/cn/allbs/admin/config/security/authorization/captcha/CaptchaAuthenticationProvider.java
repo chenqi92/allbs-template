@@ -17,7 +17,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Objects;
 
-import static cn.allbs.admin.config.constants.CacheConstant.*;
+import static cn.allbs.admin.config.constants.CacheConstant.IMAGE_CAPTCHA_PREFIX_KEY;
 import static cn.allbs.admin.config.constants.SecurityConstant.*;
 
 /**

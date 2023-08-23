@@ -1,6 +1,7 @@
 package cn.allbs.admin.controller;
 
 import cn.allbs.admin.config.redis.RedisOperator;
+import cn.allbs.admin.config.security.annotation.IgnoreUri;
 import cn.allbs.admin.config.security.model.CaptchaResult;
 import cn.allbs.common.utils.R;
 import cn.hutool.captcha.CaptchaUtil;
@@ -26,6 +27,7 @@ public class LoginController {
 
     private final RedisOperator<String> redisOperator;
 
+    @IgnoreUri
     @GetMapping("/getSmsCaptcha")
     public R<String> getSmsCaptcha(String phone) {
         // 示例项目，固定1234
@@ -35,6 +37,7 @@ public class LoginController {
     }
 
     @ResponseBody
+    @IgnoreUri
     @GetMapping("/getCaptcha")
     public R getCaptcha(HttpSession session) {
         // 定义图形验证码的长、宽、验证码字符数、干扰线宽度

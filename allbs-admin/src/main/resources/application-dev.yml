@@ -2,7 +2,7 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${MYSQL_HOST:allbs-mysql}:${MYSQL_PORT:3306}/${MYSQL_DB:allbs-admin}?serverTimezone=UTC&userUnicode=true&characterEncoding=utf-8
+    url: jdbc:mysql://${MYSQL_HOST:allbs-mysql}:${MYSQL_PORT:3306}/${MYSQL_DB:allbs-admin}?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true&allowPublicKeyRetrieval=true
     username: ${MYSQL_USER:root}
     password: ${PASS_COMMON_2:123456}
     hikari:
@@ -12,7 +12,7 @@ spring:
       maximum-pool-size: 20
       idle-timeout: 200000
       auto-commit: true
-      max-lifetime: 1800000
+      max-lifetime: 30000
       connection-test-query: select 1
   data:
     redis:
@@ -67,7 +67,8 @@ security:
     - /v3/api-docs/**
     - /doc.html
     - /webjars/**
-    - /druid/**
     - /static/**
     - /configuration/ui
     - /swagger-resources/**
+    - /assets/**
+    - /login
