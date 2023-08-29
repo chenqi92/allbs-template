@@ -10,13 +10,13 @@ spring:
       validation-timeout: 5000
       minimum-idle: 5
       maximum-pool-size: 20
-      idle-timeout: 200000
+      idle-timeout: 20000
       auto-commit: true
       max-lifetime: 30000
       connection-test-query: select 1
   data:
     redis:
-      database: 0
+      database: 2
       host: ${REDIS_HOST_DEV:127.0.0.1}
       port: 6379
       password: ${REDIS_PWD_DEV:123456}

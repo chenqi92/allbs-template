@@ -1,5 +1,7 @@
 package cn.allbs.admin.config.security.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
@@ -15,6 +17,8 @@ import java.util.Collection;
  * @date 2023/8/18
  */
 @Getter
+@JsonSerialize
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SysUser extends User {
 
     /**
